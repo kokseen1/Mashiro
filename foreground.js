@@ -4,7 +4,7 @@ function getOrigSearchQuery() {
     let origSearchQuery = searchBox.attr("value");
 
     // Remove suffix if exists
-    const queryReg = /([1|3|5]00+users入り)$/g;
+    const queryReg = /([1|3|5]0+users入り)$/g;
     let queryMatch = origSearchQuery.match(queryReg);
     if (queryMatch) {
         let suffixLen = queryMatch[0].length;
