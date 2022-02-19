@@ -1,0 +1,42 @@
+{
+    "name": "Mashiro",
+    "description": "Enable Popular Mode on Pixiv",
+    "version": "0.1.0",
+    "manifest_version": 3,
+    "icons": {
+        "16": "./images/mashiro.png",
+        "32": "./images/mashiro.png",
+        "64": "./images/mashiro.png",
+        "128": "./images/mashiro.png"
+    },
+    "background": {
+        "service_worker": "./background.js"
+    },
+    "action": {
+        "default_icons": {
+            "16": "./images/mashiro.png",
+            "32": "./images/mashiro.png",
+            "64": "./images/mashiro.png",
+            "128": "./images/mashiro.png"
+        }
+    },
+    "permissions": [
+        "activeTab",
+        "tabs",
+        "storage",
+        "scripting"
+    ],
+    "host_permissions": [
+        "https://www.pixiv.net/*"
+    ],
+    "content_scripts": [
+        {
+            "matches": [
+                "https://www.pixiv.net/*"
+            ],
+            "js": [
+                "jquery-3.6.0.min.js"
+            ]
+        }
+    ]
+}
