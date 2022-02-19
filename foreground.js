@@ -1,7 +1,16 @@
 function getOrigSearchQuery() {
-    let searchBox = $(".sc-5ki62n-4.eOTMOA");
-    if (!searchBox.length) searchBox = $(".sc-5ki62n-4.dMJvPw");
+    let searchBox = $(".sc-5ki62n-4.eOTMOA"); // Might be user specific
+    if (!searchBox.length) searchBox = $(".sc-5ki62n-4.dMJvPw"); // Not logged in
     let origSearchQuery = searchBox.attr("value");
+
+    // Remove suffix if exists
+    const queryReg = /([1|3|5]00+users入り)$/g;
+    let queryMatch = origSearchQuery.match(queryReg);
+    if (queryMatch) {
+        let suffixLen = queryMatch[0].length;
+        origSearchQuery = origSearchQuery.slice(0, 0 - suffixLen);
+    }
+
     return origSearchQuery;
 }
 
@@ -124,7 +133,7 @@ function getPopular() {
     //     async: false
     // });
     // Search all possible suffixes
-    let suffixes = ["100000", "50000", "30000", "10000", "5000", "1000", "500", "100"];
+    let suffixes = ["100000", "50000", "30000", "10000", "5000", "1000", "500", "100", "50"];
     suffixes.forEach(suffix => {
         searchThisSuffix(suffix);
     })
