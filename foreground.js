@@ -15,7 +15,7 @@ function getOrigSearchQuery() {
 }
 
 function genIllustSearchUrl(origSearchQuery, suffix = 100, page = 1) {
-    let searchQuery = origSearchQuery + suffix + "users入り";
+    let searchQuery = encodeURIComponent(origSearchQuery) + suffix + "users入り";
     let illustSearchUrl = `https://www.pixiv.net/ajax/search/artworks/${searchQuery}?word=${searchQuery}&order=date&mode=all&p=${page}&s_mode=s_tag&type=all&lang=en`;
     return illustSearchUrl;
 }
