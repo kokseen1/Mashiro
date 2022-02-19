@@ -91,7 +91,7 @@ function searchThisSuffix(suffix, page = 1) {
         }
 
         // Recursively get more popular illusts
-        if (suffixResultsLen == 60 && ["100000", "50000", "10000", "5000"].includes(suffix)) searchThisSuffix(suffix, page + 1);
+        if (suffixResultsLen == 60 && ["100000", "50000", "30000", "10000", "5000"].includes(suffix)) searchThisSuffix(suffix, page + 1);
 
     });
 }
@@ -124,7 +124,7 @@ function getPopular() {
     //     async: false
     // });
     // Search all possible suffixes
-    let suffixes = ["100000", "50000", "10000", "5000", "1000", "500", "100"];
+    let suffixes = ["100000", "50000", "30000", "10000", "5000", "1000", "500", "100"];
     suffixes.forEach(suffix => {
         searchThisSuffix(suffix);
     })
