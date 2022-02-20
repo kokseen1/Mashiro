@@ -8,7 +8,9 @@ This extension is not able to enable the official **sort by popular** mode, but 
 
 ## Disclaimer
 
-It only works for certain *(very few)* tags.
+It only works for certain *(~very~ few)* tags.
+
+Still a WIP. Very unstable. Lots of things yet to be cleaned up.
 
 ## Notes
 
@@ -16,7 +18,8 @@ It only works for certain *(very few)* tags.
 	 - Examples:
 		 - エヴァ (instead of エヴァンゲリオン)
 		 - SAO (instead of ソードアート・オンライン)
- - Character names don't work 99% of the time
+ - Character names don't work ~99%~ 40% of the time
+ 	 - Most popular character tags are now supported!
  - Only the most common and generic tags work
 	 - Examples:
 		 - オリジナル
