@@ -187,6 +187,25 @@ function handleRecos(recoUrl, query) {
     });
 }
 
+function altPopSearch() {
+    let query = getOrigSearchQuery();
+    // Try popular key
+    $.getJSON(genSearchUrl(query), function (data) {
+        let permaIllustArr = data.body.popular.permanent;
+        console.log(data);
+        removeAllLi();
+        let pageNav = $(".sc-xhhh7v-0.kYtoqc");
+        $(pageNav).remove();
+        permaIllustArr.forEach(i => {
+            let illust_id = i.id;
+            injectLi(i);
+            let recoUrl = genRecoUrl(illust_id);
+            console.log(recoUrl);
+            handleRecos(recoUrl, query);
+        });
+    });
+}
+
 function preCheckPopular() {
     // Remove banner
     $(".sc-jn70pf-2.dhOsiK").parent().remove();
@@ -214,23 +233,7 @@ function preCheckPopular() {
             // Results exist
             $("#pop").css("color", "rgb(255 126 48)");
         } else {
-            // Try popular key
-            $.getJSON(genSearchUrl(query), function (data) {
-                let permaIllustArr = data.body.popular.permanent;
-                console.log(data);
-                removeAllLi();
-                let pageNav = $(".sc-xhhh7v-0.kYtoqc");
-                $(pageNav).remove();
-                permaIllustArr.forEach(i => {
-                    let illust_id = i.id;
-                    let suffix;
-
-                    injectLi(i, suffix);
-                    let recoUrl = genRecoUrl(illust_id);
-                    console.log(recoUrl);
-                    handleRecos(recoUrl, query);
-                });
-            });
+            newPopElem.on("click", altPopSearch);
         }
     });
 }
