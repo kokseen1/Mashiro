@@ -256,7 +256,7 @@ var canvasIds = [];
 if (document.getElementById("pop")) {
     console.log("Already added button!");
     // Clear injected elements
-    $(".inj-li").remove();
+    // $(".inj-li").remove();
     // Reset popular button
     $("#pop").css("color", "");
 
