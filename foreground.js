@@ -1,4 +1,5 @@
 function suffixRegex(query) {
+    // console.log(query);
     const queryReg = /(([1|3|5]0+)users入り)$/;
     let queryMatch = query.match(queryReg);
     // queryMatch[0/1]: 100users入り
@@ -7,8 +8,11 @@ function suffixRegex(query) {
 }
 
 function getOrigSearchQuery() {
-    let searchBox = $(".sc-5ki62n-4.eOTMOA"); // Might be user specific
-    if (!searchBox.length) searchBox = $(".sc-5ki62n-4.dMJvPw"); // Not logged in
+
+    // let searchBox = $(".sc-5ki62n-4.eOTMOA"); // Might be user specific
+    // if (!searchBox.length) searchBox = $(".sc-5ki62n-4.dMJvPw"); // Not logged in
+    let searchBox = $("#root > div:nth-child(2) > div.sc-12xjnzy-0.dIGjtZ > div:nth-child(1) > div:nth-child(1) > div > div.sc-epuuy1-0.hxckiU > form > div > input"); // Light theme
+    if (!searchBox.length) searchBox = $("#root > div:nth-child(2) > div.sc-12xjnzy-0.iqkFre > div:nth-child(1) > div:nth-child(1) > div > div.sc-epuuy1-0.hxckiU > form > div > input"); // Dark theme
     let origSearchQuery = searchBox.attr("value");
 
     // Remove suffix if exists
@@ -176,6 +180,7 @@ function genRecoUrl(illust_id, limit = 180) {
 }
 
 function handleRecos(recoUrl, query) {
+    console.log(recoUrl);
     $.getJSON(recoUrl, function (data) {
         let recoIllustsArr = data.body.illusts;
         // console.log(data);
@@ -185,7 +190,10 @@ function handleRecos(recoUrl, query) {
                 // console.log("unrelated skipped", i.tags, query)
                 return;
             }
+            // if (canvasIds.includes(i.id)) return;
             injectLi(i);
+            // let recoUrl = genRecoUrl(i.id);
+            // handleRecos(recoUrl, query);
         });
     });
 }
@@ -214,7 +222,7 @@ function altPopSearch() {
 
 function preCheckPopular() {
     // Remove banner
-    $(".sc-jn70pf-2.dhOsiK").parent().remove();
+    // $(".sc-jn70pf-2.dhOsiK").parent().remove();
 
     // Hide if unnecessary
     let thumbsUl = $(".sc-l7cibp-1.krFoBL");
@@ -239,7 +247,8 @@ function preCheckPopular() {
             // Results exist
             $("#pop").css("color", "rgb(255 126 48)");
         } else {
-            newPopElem.on("click", altPopSearch);
+            $("#pop").css("color", "rgb(0 150 240)");
+            // newPopElem.on("click", altPopSearch);
         }
     });
 }
@@ -291,6 +300,7 @@ if (document.getElementById("pop")) {
     newPopElem.attr("id", "pop");
 
     // Add click callback
+    newPopElem.on("click", altPopSearch);
     newPopElem.on("click", getPopular);
     // newPopElem.on("click", removeAllLi);
     popSortElem.after(newPopElem);

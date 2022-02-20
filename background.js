@@ -1,5 +1,5 @@
 chrome.tabs.onUpdated.addListener((tabId, changeInfo, tab) => {
-    if (changeInfo.status === 'complete' && /^https:\/\/www\.pixiv\.net\/en\/tags\/.+/.test(tab.url)) {
+    if (changeInfo.status === 'complete' && /^https:\/\/www\.pixiv\.net\/en\/tags\/.+\/(illustrations|manga).*$/.test(tab.url)) {
         chrome.scripting.insertCSS({
             target: { tabId: tabId },
             files: ["./foreground_styles.css"]
