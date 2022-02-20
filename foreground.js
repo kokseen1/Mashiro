@@ -39,6 +39,7 @@ function injectLi(i, suffix) {
     if (!illust_tags) return;
     illust_tags.forEach(tag => {
         let suffixReg = suffixRegex(tag);
+        // console.log(suffixReg);
         if (suffixReg) {
             suffix = suffixReg[2];
             return;
@@ -53,7 +54,7 @@ function injectLi(i, suffix) {
     let illust_thumb_url = i.url;
     let illust_alt = i.alt;
     let illust_title = i.title;
-    console.log("Injecting", illust_id, suffix);
+    // console.log("Injecting", illust_id, suffix);
 
     // Craft li
     let thumbLi = $(`<li class='sc-l7cibp-2 gpVAva inj-li'></li>`)
@@ -87,12 +88,13 @@ function searchThisSuffix(suffix, page = 1) {
 
 
     $.getJSON(illustSearchUrl, function (data) {
+        // console.log(illustSearchUrl);
         let skipped_items = 0;
         let illustsArr = data.body.illustManga.data;
         let suffixResultsLen = illustsArr.length;
 
         illustsArr.forEach(i => {
-
+            // console.log(i);
             let illust_type = i.illustType;
             if (currMode == "illust" && illust_type == 1) {
                 // Skip manga
@@ -112,7 +114,6 @@ function searchThisSuffix(suffix, page = 1) {
                 skipped_items += 1;
                 return;
             }
-
             injectLi(i, suffix);
 
         });
@@ -137,10 +138,12 @@ function searchThisSuffix(suffix, page = 1) {
 
 function removeAllLi() {
     $(".sc-l7cibp-2.gpVAva").remove();
+    canvasIds = [];
     console.log("removed all li");
 }
 
 function getPopular() {
+    removeAllLi();
     // Get elements
     let illustCountDiv = $(".sc-7zddlj-2.dVRwUc").find("span");
     let pageNav = $(".sc-xhhh7v-0.kYtoqc");
@@ -149,7 +152,7 @@ function getPopular() {
     $(".sc-7zddlj-3.kWbWNM").eq(-1).text("Popular Illustrations");
     $(pageNav).remove();
     $(illustCountDiv).text("0");
-    removeAllLi();
+    console.log("pop running!")
     // $(thumbsUl).html("");
 
 
@@ -175,11 +178,11 @@ function genRecoUrl(illust_id, limit = 180) {
 function handleRecos(recoUrl, query) {
     $.getJSON(recoUrl, function (data) {
         let recoIllustsArr = data.body.illusts;
-        console.log(data);
+        // console.log(data);
         recoIllustsArr.forEach(i => {
             // Skip unrelated
             if (i.tags && !i.tags.includes(query)) {
-                console.log("unrelated skipped", i.tags, query)
+                // console.log("unrelated skipped", i.tags, query)
                 return;
             }
             injectLi(i);
@@ -188,19 +191,22 @@ function handleRecos(recoUrl, query) {
 }
 
 function altPopSearch() {
+    console.log("alt pop running!");
     let query = getOrigSearchQuery();
     // Try popular key
-    $.getJSON(genSearchUrl(query), function (data) {
+    let querySearchUrl = genSearchUrl(query);
+    $.getJSON(querySearchUrl, function (data) {
         let permaIllustArr = data.body.popular.permanent;
-        console.log(data);
-        removeAllLi();
+        // console.log("query",querySearchUrl);
+        // removeAllLi();
         let pageNav = $(".sc-xhhh7v-0.kYtoqc");
         $(pageNav).remove();
         permaIllustArr.forEach(i => {
             let illust_id = i.id;
+            // console.log(i);
             injectLi(i);
             let recoUrl = genRecoUrl(illust_id);
-            console.log(recoUrl);
+            // console.log(recoUrl);
             handleRecos(recoUrl, query);
         });
     });
@@ -256,7 +262,7 @@ var canvasIds = [];
 if (document.getElementById("pop")) {
     console.log("Already added button!");
     // Clear injected elements
-    // $(".inj-li").remove();
+    $(".inj-li").remove();
     // Reset popular button
     $("#pop").css("color", "");
 
@@ -286,6 +292,7 @@ if (document.getElementById("pop")) {
 
     // Add click callback
     newPopElem.on("click", getPopular);
+    // newPopElem.on("click", removeAllLi);
     popSortElem.after(newPopElem);
 
     // Inject sections
