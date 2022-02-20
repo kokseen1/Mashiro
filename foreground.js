@@ -297,7 +297,8 @@ if (document.getElementById("pop")) {
         .append($(`<div id="inj-5000" class="inj-sect"></div>`))
         .append($(`<div id="inj-1000" class="inj-sect"></div>`))
         .append($(`<div id="inj-500" class="inj-sect"></div>`))
-        .append($(`<div id="inj-100" class="inj-sect"></div>`));
+        .append($(`<div id="inj-100" class="inj-sect"></div>`))
+        .append($(`<div id="inj-50" class="inj-sect"></div>`));
     $(".inj-sect").css("display", "contents");
 
     preCheckPopular();
