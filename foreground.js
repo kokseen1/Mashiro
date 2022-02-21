@@ -1,3 +1,36 @@
+console.log("Running foreground");
+var JQUERY_SCRIPT_ID = "inj-script";
+var JQUERY_PATH = "jquery-3.6.0.min.js";
+var LOGIN_BANNER_CLASS = ".sc-oh3a2p-4.gHKmNu";
+var POP_SORT_ICON_CLASS = ".sc-1xl12os-0.sc-rkvk44-0.cvJBhn.jSdItB";
+
+// For title formatting
+var LI_TITLE_CLASS_LOGGEDOUT = "sc-d98f2c-0 sc-iasfms-4 hFGeeG";
+var LI_TITLE_CLASS_LOGGEDIN = "sc-d98f2c-0 sc-iasfms-4 cTvdTb";
+var THUMBS_UL_CLASS = ".sc-l7cibp-1.krFoBL";
+
+var MODE_ILLUST = "illust";
+var MODE_MANGA = "manga";
+
+var COLOR_ORANGE = "rgb(255 126 48)";
+var COLOR_BLUE = "rgb(0 150 240)";
+var SUFFIXES = ["100000", "50000", "30000", "10000", "5000", "1000", "500", "100", "50"];
+var LI_CLASS = ".sc-l7cibp-2.gpVAva";
+// var COUNT_DIV_CLASS = ".sc-7zddlj-2.dVRwUc";
+var COUNT_DIV_SELECTOR = "#root > div:nth-child(2) > div.sc-1nr368f-2.kBWrTb > div > div.sc-15n9ncy-0.jORshO > div > section:nth-child(3) > div.sc-7zddlj-0.dFLqqk > div > div > div > span";
+
+var currMode = MODE_ILLUST;
+var canvasIds = [];
+var liTitleClass = LI_TITLE_CLASS_LOGGEDIN;
+
+var TAG_FAKE = "虚偽users入りタグ";
+
+var SEARCHBOX_LIGHT_SELECTOR = "#root > div:nth-child(2) > div.sc-12xjnzy-0.dIGjtZ > div:nth-child(1) > div:nth-child(1) > div > div.sc-epuuy1-0.hxckiU > form > div > input";
+
+var SEARCHBOX_DARK_SELECTOR = "#root > div:nth-child(2) > div.sc-12xjnzy-0.iqkFre > div:nth-child(1) > div:nth-child(1) > div > div.sc-epuuy1-0.hxckiU > form > div > input";
+
+var INJ_POP_ID = "inj-pop";
+
 function suffixRegex(query) {
     // console.log(query);
     const queryReg = /(([1|3|5]0+)users入り)$/;
@@ -11,8 +44,10 @@ function getOrigSearchQuery() {
 
     // let searchBox = $(".sc-5ki62n-4.eOTMOA"); // Might be user specific
     // if (!searchBox.length) searchBox = $(".sc-5ki62n-4.dMJvPw"); // Not logged in
-    let searchBox = $("#root > div:nth-child(2) > div.sc-12xjnzy-0.dIGjtZ > div:nth-child(1) > div:nth-child(1) > div > div.sc-epuuy1-0.hxckiU > form > div > input"); // Light theme
-    if (!searchBox.length) searchBox = $("#root > div:nth-child(2) > div.sc-12xjnzy-0.iqkFre > div:nth-child(1) > div:nth-child(1) > div > div.sc-epuuy1-0.hxckiU > form > div > input"); // Dark theme
+
+
+    let searchBox = $(SEARCHBOX_LIGHT_SELECTOR); // Light theme
+    if (!searchBox.length) searchBox = $(SEARCHBOX_DARK_SELECTOR); // Dark theme
     let origSearchQuery = searchBox.attr("value");
 
     // Remove suffix if exists
@@ -32,8 +67,8 @@ function genSearchUrl(searchQuery, page = 1) {
     return illustSearchUrl;
 }
 
-function genSuffixedSearchUrl(origSearchQuery, suffix = 100, page = 1) {
-    let searchQuery = origSearchQuery + suffix + "users入り";
+function genSuffixedSearchUrl(origSearchQuery, suffix, page = 1) {
+    let searchQuery = `${origSearchQuery}${suffix}users入り`;
     let illustSearchUrl = genSearchUrl(searchQuery, page);
     return illustSearchUrl;
 }
@@ -41,9 +76,11 @@ function genSuffixedSearchUrl(origSearchQuery, suffix = 100, page = 1) {
 function injectLi(i, suffix) {
     let illust_tags = i.tags;
     if (!illust_tags) return;
+    // Skip fakes
+    if (illust_tags.includes(TAG_FAKE)) return;
+
     illust_tags.forEach(tag => {
         let suffixReg = suffixRegex(tag);
-        // console.log(suffixReg);
         if (suffixReg) {
             suffix = suffixReg[2];
             return;
@@ -51,9 +88,19 @@ function injectLi(i, suffix) {
     });
     // Not popular (tentative)
     if (!suffix) return;
+
     // Get illust attributes
     let illust_id = i.id;
     if (canvasIds.includes(illust_id)) return;
+    let illust_type = i.illustType;
+    if (currMode == MODE_ILLUST && illust_type == 1) {
+        // Skip manga
+        return;
+    }
+    if (currMode == MODE_MANGA && illust_type == 0) {
+        // Skip illust
+        return;
+    }
     let artist_id = i.userId;
     let illust_thumb_url = i.url;
     let illust_alt = i.alt;
@@ -74,88 +121,79 @@ function injectLi(i, suffix) {
     style="object-fit: cover; object-position: center center;">`)
                             )))))
             .append($(`<div class="sc-iasfms-0 jtpclu"></div>`)
-                .append($(`<a class="${titleClass}" href="/en/artworks/${illust_id}">${illust_title}</a>`))));
+                .append($(`<a class="${liTitleClass}" href="/en/artworks/${illust_id}">${illust_title}</a>`))));
 
     // Inject li to appropriate section
     $(`#inj-${suffix}`).append(thumbLi);
     canvasIds.push(illust_id);
+    $(COUNT_DIV_SELECTOR).text(canvasIds.length);
 }
 
 function searchThisSuffix(suffix, page = 1) {
-    let illustCountDiv = $(".sc-7zddlj-2.dVRwUc").find("span");
-
     // Get search query
     let origSearchQuery = getOrigSearchQuery();
     let illustSearchUrl = genSuffixedSearchUrl(origSearchQuery, suffix, page);
-    // console.log(illustSearchUrl);
+    console.log(illustSearchUrl);
 
 
 
     $.getJSON(illustSearchUrl, function (data) {
         // console.log(illustSearchUrl);
-        let skipped_items = 0;
         let illustsArr = data.body.illustManga.data;
-        let suffixResultsLen = illustsArr.length;
 
         illustsArr.forEach(i => {
             // console.log(i);
-            let illust_type = i.illustType;
-            if (currMode == "illust" && illust_type == 1) {
-                // Skip manga
-                skipped_items += 1;
-                return;
-            }
-            if (currMode == "manga" && illust_type == 0) {
-                // Skip illust
-                skipped_items += 1;
-                return;
-            }
 
-            // Todo: Move to injectLi
-            let illust_tags = i.tags;
-            if (illust_tags.includes("虚偽users入りタグ")) {
-                // Skip fakes
-                skipped_items += 1;
-                return;
-            }
+
+
             injectLi(i, suffix);
 
         });
 
         // Update count
-        let currIllustCount = parseInt(illustCountDiv.text());
-        let netResultsLen = suffixResultsLen - skipped_items;
-        illustCountDiv.text((currIllustCount + netResultsLen).toString());
+        // let currIllustCount = parseInt($(COUNT_DIV_SELECTOR).text());
+        // let netResultsLen = suffixResultsLen - skipped_items;
+        // illustCountDiv.text((currIllustCount + netResultsLen).toString());
 
-        console.log(`${suffix}users p${page}: ${netResultsLen} items`);
+        // console.log(`${suffix}users p${page}: ${netResultsLen} items`);
 
         // Killswitch
-        if (currIllustCount > 2000) {
+        if (canvasIds.length > 2000) {
             return;
         }
 
         // Recursively get more popular illusts
-        if (suffixResultsLen == 60 && ["100000", "50000", "30000", "10000", "5000"].includes(suffix)) searchThisSuffix(suffix, page + 1);
+        if (illustsArr.length == 60 && SUFFIXES.slice(0, 5).includes(suffix)) searchThisSuffix(suffix, page + 1);
 
     });
 }
 
+
 function removeAllLi() {
-    $(".sc-l7cibp-2.gpVAva").remove();
+    $(LI_CLASS).remove();
     canvasIds = [];
     console.log("removed all li");
 }
 
-function getPopular() {
-    removeAllLi();
-    // Get elements
-    let illustCountDiv = $(".sc-7zddlj-2.dVRwUc").find("span");
+function removePageNav() {
     let pageNav = $(".sc-xhhh7v-0.kYtoqc");
+    $(pageNav).remove();
+}
+
+function prepFetch() {
+    removeAllLi();
+    removePageNav();
+    $(COUNT_DIV_SELECTOR).text("0");
+    // $(".sc-7zddlj-3.kWbWNM").text("Popular Illustrations");
+    $("#root > div:nth-child(2) > div.sc-1nr368f-2.kBWrTb > div > div.sc-15n9ncy-0.jORshO > div > section:nth-child(3) > div.sc-7zddlj-0.dFLqqk > div > h3").text("Popular Illustrations");
+}
+
+function getPopular() {
+    // Get elements
+
 
     // Make some UI changes
-    $(".sc-7zddlj-3.kWbWNM").eq(-1).text("Popular Illustrations");
-    $(pageNav).remove();
-    $(illustCountDiv).text("0");
+
     console.log("pop running!")
     // $(thumbsUl).html("");
 
@@ -166,8 +204,8 @@ function getPopular() {
     //     async: false
     // });
     // Search all possible suffixes
-    let suffixes = ["100000", "50000", "30000", "10000", "5000", "1000", "500", "100", "50"];
-    suffixes.forEach(suffix => {
+
+    SUFFIXES.forEach(suffix => {
         searchThisSuffix(suffix);
     })
     // $.ajaxSetup({
@@ -179,13 +217,11 @@ function genRecoUrl(illust_id, limit = 180) {
     return `https://www.pixiv.net/ajax/illust/${illust_id}/recommend/init?limit=${limit}&lang=en`
 }
 
-function handleRecos(recoUrl, query) {
-    console.log(recoUrl);
-    $.getJSON(recoUrl, function (data) {
+function handleRecos(illust_id, query) {
+    $.getJSON(genRecoUrl(illust_id), function (data) {
         let recoIllustsArr = data.body.illusts;
-        // console.log(data);
         recoIllustsArr.forEach(i => {
-            // Skip unrelated
+            // Skip unrelated (might move to injectLi)
             if (i.tags && !i.tags.includes(query)) {
                 // console.log("unrelated skipped", i.tags, query)
                 return;
@@ -198,7 +234,7 @@ function handleRecos(recoUrl, query) {
     });
 }
 
-function altPopSearch() {
+function getAltPop() {
     console.log("alt pop running!");
     let query = getOrigSearchQuery();
     // Try popular key
@@ -207,116 +243,136 @@ function altPopSearch() {
         let permaIllustArr = data.body.popular.permanent;
         // console.log("query",querySearchUrl);
         // removeAllLi();
-        let pageNav = $(".sc-xhhh7v-0.kYtoqc");
-        $(pageNav).remove();
         permaIllustArr.forEach(i => {
-            let illust_id = i.id;
             // console.log(i);
             injectLi(i);
-            let recoUrl = genRecoUrl(illust_id);
             // console.log(recoUrl);
-            handleRecos(recoUrl, query);
+            handleRecos(i.id, query);
         });
     });
 }
 
-function preCheckPopular() {
+function removeBanner() {
     // Remove banner
-    // $(".sc-jn70pf-2.dhOsiK").parent().remove();
+    $(".sc-jn70pf-2.dhOsiK").parent().remove();
+}
+
+
+function preCheckPopular() {
+    let injPop = $("#inj-pop");
+    injPop.off();
+    // removeBanner();
 
     // Hide if unnecessary
-    let thumbsUl = $(".sc-l7cibp-1.krFoBL");
+    // let thumbsUl = $(THUMBS_UL_CLASS);
     // console.log("Hide?: ", thumbsUl.length);
-    if (!thumbsUl.length) {
-        $("#pop").hide();
-        return;
-    } else {
-        $("#pop").show();
+    // if (!thumbsUl.length) {
+    //     console.log("hiding inj")
+    //     injPop.hide();
+    //     return;
+    // } else {
+    //     console.log("showing inj")
+    //     injPop.show();
+    // }
+
+    // Set mode
+    if (window.location.toString().includes(`/${MODE_MANGA}`)) {
+        currMode = MODE_MANGA;
     }
 
-    currMode = "illust";
-    if (window.location.toString().endsWith("manga")) {
-        currMode = "manga";
-    }
+    // Todo: move incognito/logged in checks all to one place
+    if ($(LOGIN_BANNER_CLASS).length) liTitleClass = LI_TITLE_CLASS_LOGGEDOUT;
+
+    injPop.on("click", prepFetch);
 
     // Temp search for 100users
-    let query = getOrigSearchQuery();
-    let tempIllustSearchUrl = genSuffixedSearchUrl(query);
+    let origQuery = getOrigSearchQuery();
+
+    let tempQuerySearchUrl = genSearchUrl(origQuery);
+    $.getJSON(tempQuerySearchUrl, function (data) {
+        if (data.body.popular.permanent.length) {
+            console.log("color",injPop.css("color") == "rgba(0, 0, 0, 0.32)")
+            injPop.css("color", COLOR_BLUE);
+            injPop.on("click", getAltPop);
+        };
+    });
+
+    let tempIllustSearchUrl = genSuffixedSearchUrl(origQuery, 100);
     $.getJSON(tempIllustSearchUrl, function (data) {
         if (data.body.illustManga.data.length) {
             // Results exist
-            $("#pop").css("color", "rgb(255 126 48)");
-        } else {
-            $("#pop").css("color", "rgb(0 150 240)");
-            // newPopElem.on("click", altPopSearch);
+            console.log("color",injPop.css("color"))
+            injPop.css("color", COLOR_ORANGE);
+            injPop.on("click", getPopular);
         }
     });
 }
 
+// Inject jQuery into document head
 function injectJQuery() {
-    let script = document.createElement('script');
-    script.id = "inj-script";
-    script.src = chrome.runtime.getURL("jquery-3.6.0.min.js")
-    script.type = 'text/javascript';
-    document.getElementsByTagName('head')[0].appendChild(script);
+    let isJQueryInjected = document.getElementById(JQUERY_SCRIPT_ID);
+    // Return if already exists
+    if (isJQueryInjected) return;
+    let script = document.createElement("script");
+    script.id = JQUERY_SCRIPT_ID;
+    script.src = chrome.runtime.getURL(JQUERY_PATH);
+    script.type = "text/javascript";
+    document.getElementsByTagName("head")[0].appendChild(script);
 }
 
-// For title formatting
-var titleClass = "sc-d98f2c-0 sc-iasfms-4 cTvdTb";
 
-var currMode = "illust";
+function injectPopular() {
+    // Inject Popular button
+    let ogPopSort = $(POP_SORT_ICON_CLASS).parent();
+    let injPop = ogPopSort.clone();
+    injPop.text("Popular");
+    injPop.attr("id", INJ_POP_ID);
 
-var canvasIds = [];
 
-if (document.getElementById("pop")) {
+    // injPop.on("click", removeAllLi);
+    ogPopSort.after(injPop);
+}
+
+function injectSections() {
+    if ($(".inj-sect").length) return;
+    // Inject sections
+    let thumbsUl = $(THUMBS_UL_CLASS);
+    SUFFIXES.forEach(suffix => {
+        thumbsUl.append($(`<div id="inj-${suffix}" class="inj-sect"></div>`))
+    });
+    // thumbsUl
+    //     .append($(`<div id="inj-100000" class="inj-sect"></div>`))
+    //     .append($(`<div id="inj-50000" class="inj-sect"></div>`))
+    //     .append($(`<div id="inj-10000" class="inj-sect"></div>`))
+    //     .append($(`<div id="inj-5000" class="inj-sect"></div>`))
+    //     .append($(`<div id="inj-1000" class="inj-sect"></div>`))
+    //     .append($(`<div id="inj-500" class="inj-sect"></div>`))
+    //     .append($(`<div id="inj-100" class="inj-sect"></div>`))
+    //     .append($(`<div id="inj-50" class="inj-sect"></div>`));
+    // $(".inj-sect").css("display", "contents");
+}
+
+var isPopInjected = document.getElementById(INJ_POP_ID);
+
+if (isPopInjected) {
+    // On tag change
     console.log("Already added button!");
+    // Can move to pre
     // Clear injected elements
     $(".inj-li").remove();
     // Reset popular button
-    $("#pop").css("color", "");
+    $("#inj-pop").css("color", "");
 
     preCheckPopular();
 } else {
-    // First run
+    // First run/manga tab switch
     console.log("Adding button");
 
     // Add jQuery
     injectJQuery();
 
-    // var popSortElem = $(".sc-93qi7v-0.csPOOw");
-    // if (!popSortElem.length) popSortElem = $(".sc-93qi7v-3.gRZmyd");
-    // $(".sc-93qi7v-0.hMbqKA")
-
-
-
-    // Todo: move incognito/logged in checks all to one place
-    if ($(".sc-oh3a2p-4.gHKmNu").length) titleClass = "sc-d98f2c-0 sc-iasfms-4 hFGeeG";
-    else titleClass = "sc-d98f2c-0 sc-iasfms-4 cTvdTb";
-
-    // Inject Popular button
-    popSortElem = $(".sc-1xl12os-0.sc-rkvk44-0.cvJBhn.jSdItB").parent();
-    newPopElem = popSortElem.clone();
-    newPopElem.html("Popular");
-    newPopElem.attr("id", "pop");
-
-    // Add click callback
-    newPopElem.on("click", altPopSearch);
-    newPopElem.on("click", getPopular);
-    // newPopElem.on("click", removeAllLi);
-    popSortElem.after(newPopElem);
-
-    // Inject sections
-    let thumbsUl = $(".sc-l7cibp-1.krFoBL");
-    thumbsUl
-        .append($(`<div id="inj-100000" class="inj-sect"></div>`))
-        .append($(`<div id="inj-50000" class="inj-sect"></div>`))
-        .append($(`<div id="inj-10000" class="inj-sect"></div>`))
-        .append($(`<div id="inj-5000" class="inj-sect"></div>`))
-        .append($(`<div id="inj-1000" class="inj-sect"></div>`))
-        .append($(`<div id="inj-500" class="inj-sect"></div>`))
-        .append($(`<div id="inj-100" class="inj-sect"></div>`))
-        .append($(`<div id="inj-50" class="inj-sect"></div>`));
-    $(".inj-sect").css("display", "contents");
+    injectPopular();
+    injectSections();
 
     preCheckPopular();
 }
