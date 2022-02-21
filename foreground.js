@@ -79,8 +79,8 @@ function injectLi(i, suffix) {
     if (!illust_tags) return;
     // Skip fakes
     if (illust_tags.includes(TAG_FAKE)) return;
-    let alt;
-    if (suffix) alt = true;
+    let popClass = "pop-alt";
+    if (suffix) popClass = "pop-suf";
     illust_tags.forEach(tag => {
         let suffixReg = suffixRegex(tag);
         if (suffixReg) {
@@ -110,7 +110,7 @@ function injectLi(i, suffix) {
     // console.log("Injecting", illust_id, suffix);
 
     // Craft li
-    let thumbLi = $(`<li class='sc-l7cibp-2 gpVAva inj-li'></li>`)
+    let thumbLi = $(`<li class='sc-l7cibp-2 gpVAva inj-li ${popClass}'></li>`)
         .append($(`<div class="sc-iasfms-3 jDiQFZ"></div>`)
             .append($(`<div type="illust" size="184" class="sc-iasfms-1 hYfnPb"></div>`)
                 .append($(`<div width="184" height="184" class="sc-rp5asc-0 fxGVAF"></div>`)
