@@ -16,8 +16,9 @@ var COLOR_ORANGE = "rgb(255 126 48)";
 var COLOR_BLUE = "rgb(0 150 240)";
 var SUFFIXES = ["100000", "50000", "30000", "10000", "5000", "1000", "500", "100", "50"];
 var LI_CLASS = ".sc-l7cibp-2.gpVAva";
-// var COUNT_DIV_CLASS = ".sc-7zddlj-2.dVRwUc";
-var COUNT_DIV_SELECTOR = "#root > div:nth-child(2) > div.sc-1nr368f-2.kBWrTb > div > div.sc-15n9ncy-0.jORshO > div > section:nth-child(3) > div.sc-7zddlj-0.dFLqqk > div > div > div > span";
+var COUNT_DIV_CLASS = ".sc-7zddlj-2.dVRwUc";
+// var COUNT_SPAN = $(COUNT_DIV_CLASS).find("span");
+// var COUNT_SPAN = "#root > div:nth-child(2) > div.sc-1nr368f-2.kBWrTb > div > div.sc-15n9ncy-0.jORshO > div > section:nth-child(3) > div.sc-7zddlj-0.dFLqqk > div > div > div > span";
 
 var currMode = MODE_ILLUST;
 var canvasIds = [];
@@ -78,7 +79,8 @@ function injectLi(i, suffix) {
     if (!illust_tags) return;
     // Skip fakes
     if (illust_tags.includes(TAG_FAKE)) return;
-
+    let alt;
+    if (suffix) alt = true;
     illust_tags.forEach(tag => {
         let suffixReg = suffixRegex(tag);
         if (suffixReg) {
@@ -126,7 +128,8 @@ function injectLi(i, suffix) {
     // Inject li to appropriate section
     $(`#inj-${suffix}`).append(thumbLi);
     canvasIds.push(illust_id);
-    $(COUNT_DIV_SELECTOR).text(canvasIds.length);
+    console.log(canvasIds.length);
+    getCountSpan().text(canvasIds.length);
 }
 
 function searchThisSuffix(suffix, page = 1) {
@@ -136,7 +139,6 @@ function searchThisSuffix(suffix, page = 1) {
     console.log(illustSearchUrl);
 
 
-
     $.getJSON(illustSearchUrl, function (data) {
         // console.log(illustSearchUrl);
         let illustsArr = data.body.illustManga.data;
@@ -144,14 +146,12 @@ function searchThisSuffix(suffix, page = 1) {
         illustsArr.forEach(i => {
             // console.log(i);
 
-
-
             injectLi(i, suffix);
 
         });
 
         // Update count
-        // let currIllustCount = parseInt($(COUNT_DIV_SELECTOR).text());
+        // let currIllustCount = parseInt(getCountSpan().text());
         // let netResultsLen = suffixResultsLen - skipped_items;
         // illustCountDiv.text((currIllustCount + netResultsLen).toString());
 
@@ -180,25 +180,21 @@ function removePageNav() {
     $(pageNav).remove();
 }
 
+function getCountSpan() {
+    return $(COUNT_DIV_CLASS).find("span");
+}
+
 function prepFetch() {
     removeAllLi();
     removePageNav();
-    $(COUNT_DIV_SELECTOR).text("0");
+    getCountSpan().text("0");
     // $(".sc-7zddlj-3.kWbWNM").text("Popular Illustrations");
     $("#root > div:nth-child(2) > div.sc-1nr368f-2.kBWrTb > div > div.sc-15n9ncy-0.jORshO > div > section:nth-child(3) > div.sc-7zddlj-0.dFLqqk > div > h3").text("Popular Illustrations");
 }
 
 function getPopular() {
-    // Get elements
-
-
-    // Make some UI changes
-
     console.log("pop running!")
     // $(thumbsUl).html("");
-
-
-
     // Dont bother using sync
     // $.ajaxSetup({
     //     async: false
@@ -287,23 +283,23 @@ function preCheckPopular() {
 
     // Temp search for 100users
     let origQuery = getOrigSearchQuery();
-
-    let tempQuerySearchUrl = genSearchUrl(origQuery);
-    $.getJSON(tempQuerySearchUrl, function (data) {
-        if (data.body.popular.permanent.length) {
-            console.log("color",injPop.css("color") == "rgba(0, 0, 0, 0.32)")
-            injPop.css("color", COLOR_BLUE);
-            injPop.on("click", getAltPop);
-        };
-    });
+    let popAvail;
 
     let tempIllustSearchUrl = genSuffixedSearchUrl(origQuery, 100);
     $.getJSON(tempIllustSearchUrl, function (data) {
         if (data.body.illustManga.data.length) {
             // Results exist
-            console.log("color",injPop.css("color"))
+            popAvail = true;
             injPop.css("color", COLOR_ORANGE);
             injPop.on("click", getPopular);
+        }
+    });
+
+    let tempQuerySearchUrl = genSearchUrl(origQuery);
+    $.getJSON(tempQuerySearchUrl, function (data) {
+        if (data.body.popular.permanent.length) {
+            if (!popAvail) injPop.css("color", COLOR_BLUE);
+            injPop.on("click", getAltPop);
         }
     });
 }
