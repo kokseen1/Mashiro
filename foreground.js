@@ -279,6 +279,8 @@ function preCheckPopular() {
     // Todo: move incognito/logged in checks all to one place
     if ($(LOGIN_BANNER_CLASS).length) liTitleClass = LI_TITLE_CLASS_LOGGEDOUT;
 
+    // Reset popular button
+    injPop.css("color", "");
     injPop.on("click", prepFetch);
 
     // Temp search for 100users
@@ -356,8 +358,7 @@ if (isPopInjected) {
     // Can move to pre
     // Clear injected elements
     $(".inj-li").remove();
-    // Reset popular button
-    $("#inj-pop").css("color", "");
+
 
     preCheckPopular();
 } else {
