@@ -6,7 +6,7 @@ var POP_SORT_ICON_CLASS = ".sc-1xl12os-0.sc-rkvk44-0.cvJBhn.jSdItB";
 
 // For title formatting
 var LI_TITLE_CLASS_LOGGEDOUT = "sc-d98f2c-0 sc-iasfms-4 hFGeeG";
-var LI_TITLE_CLASS_LOGGEDIN = "sc-d98f2c-0 sc-iasfms-4 cTvdTb";
+var LI_TITLE_CLASS_LOGGEDIN = "sc-d98f2c-0 sc-iasfms-4 cTvdTb bZOnOL";
 var THUMBS_UL_CLASS = ".sc-l7cibp-1.krFoBL";
 
 var MODE_ILLUST = "illust";
