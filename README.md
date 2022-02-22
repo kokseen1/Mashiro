@@ -4,24 +4,32 @@
 
 ![alt text](https://github.com/kokseen1/Mashiro/raw/main/images/mashiro.png?raw=true)
 
-This extension is not able to enable the official **sort by popular** mode, but merely retrieves popular illustrations and manga via tags.
+This extension does not enable the official `Sort by popularity` mode, but merely retrieves popular illustrations and manga via tags.
 
 ## Disclaimer
 
-It only works for certain *(~very~ few)* tags.
 
-Still a WIP. Very unstable. Lots of things yet to be cleaned up.
+- Works best for popular tags (>10000 results).
 
-## Notes
+- Still a WIP. Very unstable. Lots of things yet to be cleaned up.
 
- - Works best with *'official'* Pixiv series tags used by artists
+- ~It only works for certain *(~very~ few)* tags.~
+
+## Guide
+- Button turns **orange** if results from normal search are available
+- Otherwise, button turns **blue** if only alternative results are available
+- **Grey** button means no results are available
+
+## Usage Notes
+ - Works best with official Pixiv series tags used by artists. (orange + blue mode)
+	 - `エヴァ` instead of `エヴァンゲリオン`
+	 - `SAO` instead of `ソードアート・オンライン`
+ - Most character tags are supported! (blue mode)
 	 - Examples:
-		 - エヴァ (instead of エヴァンゲリオン)
-		 - SAO (instead of ソードアート・オンライン)
- - Character names don't work ~99%~ 40% of the time
- 	 - Most popular character tags are now supported!
- - Only the most common and generic tags work
+ 		- `歳納京子`
+ 		- `御坂美琴`
+ - Works well with popular generic tags.
 	 - Examples:
-		 - オリジナル
-		 - 風景
- - Only Illustrations and Manga are currently supported
+		 - `オリジナル`
+		 - `風景`
+ - Only Illustrations and Manga are currently supported.
