@@ -13,6 +13,10 @@ var COLOR_BLUE = "rgb(0 150 240)";
 
 var canvasIds = [];
 
+var currMode;
+var liTitleClass;
+
+
 var INJ_POP_ID = "inj-pop";
 var INJ_LI_CLASS = "inj-li";
 var LOGIN_BANNER_CLASS = ".sc-oh3a2p-4.gHKmNu";
@@ -142,7 +146,7 @@ function handleSuffix(suffix, page = 1) {
 function removeAllLi() {
     $(LI_CLASS).remove();
     canvasIds = [];
-    console.log("removed all li");
+    console.log("Removed all thumbs");
 }
 
 // Remove the page navigation bar
@@ -173,6 +177,7 @@ function prepFetch() {
     removePageNav();
     $(COUNT_DIV_CLASS).text("0");
 
+    // Retrieve global configs
     getCurrMode();
     getLiTitleClass();
 }
@@ -180,8 +185,6 @@ function prepFetch() {
 // Callback to retrieve popular via suffix
 function popCallback() {
     console.log("Pop running!")
-
-    prepFetch();
 
     // Search all possible popular suffixes
     SUFFIXES.forEach(suffix => {
@@ -212,8 +215,6 @@ function handleRecos(illust_id, query) {
 // Function to fetch and inject alt pop
 function altPopCallback() {
     console.log("Alt pop running!");
-
-    prepFetch();
 
     let query = getSearchQuery();
     let querySearchUrl = genSearchUrl(query);
@@ -276,6 +277,7 @@ function handleStateChange() {
     // Reset popular button
     let injPop = $(`#${INJ_POP_ID}`);
     injPop.off();
+    injPop.on("click", prepFetch);
     injPop.css("color", "");
 
     addClickCallbacks();
