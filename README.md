@@ -10,9 +10,7 @@ This extension does not enable the official `Sort by popularity` mode, but merel
 
 
 - Works best for popular tags (>10000 results).
-
 - Still a WIP. Very unstable. Lots of things yet to be cleaned up.
-
 - ~It only works for certain *(~very~ few)* tags.~
 
 ## Guide
