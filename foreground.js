@@ -1,3 +1,5 @@
+var SUFFIXES = ["100000", "50000", "30000", "10000", "5000", "1000", "500", "100", "50"];
+
 var JQUERY_SCRIPT_ID = "inj-script";
 var JQUERY_PATH = "jquery-3.6.0.min.js";
 
@@ -5,8 +7,6 @@ var TAG_FAKE = "虚偽users入りタグ";
 
 var MODE_ILLUST = "illust";
 var MODE_MANGA = "manga";
-
-var SUFFIXES = ["100000", "50000", "30000", "10000", "5000", "1000", "500", "100", "50"];
 
 var COLOR_ORANGE = "rgb(253 158 22)";
 var COLOR_BLUE = "rgb(0 150 250)";
@@ -16,7 +16,6 @@ var popClickCallbacks = [];
 
 var currMode;
 var liTitleClass;
-
 
 var INJ_POP_ID = "inj-pop";
 var INJ_LI_CLASS = "inj-li";
@@ -29,11 +28,6 @@ var LI_CLASS = ".sc-l7cibp-2.gpVAva";
 var COUNT_DIV_CLASS = ".sc-7zddlj-2.dVRwUc span";
 var PAGE_NAV_CLASS = ".sc-xhhh7v-0.kYtoqc";
 var SEARCHBOX_CLASS = ".sc-5ki62n-4";
-
-// var COUNT_SPAN = $(COUNT_DIV_CLASS).find("span");
-// var COUNT_SPAN = "#root > div:nth-child(2) > div.sc-1nr368f-2.kBWrTb > div > div.sc-15n9ncy-0.jORshO > div > section:nth-child(3) > div.sc-7zddlj-0.dFLqqk > div > div > div > span";
-// var SEARCHBOX_LIGHT_SELECTOR = "#root > div:nth-child(2) > div.sc-12xjnzy-0.dIGjtZ > div:nth-child(1) > div:nth-child(1) > div > div.sc-epuuy1-0.hxckiU > form > div > input";
-// var SEARCHBOX_DARK_SELECTOR = "#root > div:nth-child(2) > div.sc-12xjnzy-0.iqkFre > div:nth-child(1) > div:nth-child(1) > div > div.sc-epuuy1-0.hxckiU > form > div > input";
 
 // Perform regex matching to find suffix
 function suffixRegex(query) {
