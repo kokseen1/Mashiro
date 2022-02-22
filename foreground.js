@@ -12,6 +12,7 @@ var COLOR_ORANGE = "rgb(255 126 48)";
 var COLOR_BLUE = "rgb(0 150 240)";
 
 var canvasIds = [];
+var popClickCallbacks = [];
 
 var currMode;
 var liTitleClass;
@@ -159,7 +160,7 @@ function removePageNav() {
 function getCurrMode() {
     let currUrl = window.location.toString();
     // Default to illusts
-    var currMode = MODE_ILLUST;
+    currMode = MODE_ILLUST;
     if (currUrl.includes(`/${MODE_MANGA}`)) {
         currMode = MODE_MANGA;
     }
@@ -167,7 +168,7 @@ function getCurrMode() {
 
 // Define appropriate global li class name
 function getLiTitleClass() {
-    var liTitleClass = LI_TITLE_LOGGEDIN_CLASS;
+    liTitleClass = LI_TITLE_LOGGEDIN_CLASS;
     if ($(LOGIN_BANNER_CLASS).length) liTitleClass = LI_TITLE_LOGGEDOUT_CLASS;
 }
 
@@ -180,6 +181,10 @@ function prepFetch() {
     // Retrieve global configs
     getCurrMode();
     getLiTitleClass();
+
+    popClickCallbacks.forEach(function (callbackFunc) {
+        callbackFunc();
+    });
 }
 
 // Callback to retrieve popular via suffix
@@ -251,7 +256,7 @@ function addClickCallbacks() {
             // Results exist for popular suffixed
             popAvail = true;
             injPop.css("color", COLOR_ORANGE);
-            injPop.on("click", popCallback);
+            popClickCallbacks.push(popCallback);
         }
     });
 
@@ -261,7 +266,7 @@ function addClickCallbacks() {
         if (data.body.popular.permanent.length) {
             // Results exist for alt pop
             if (!popAvail) injPop.css("color", COLOR_BLUE);
-            injPop.on("click", altPopCallback);
+            popClickCallbacks.push(altPopCallback);
         }
         // Todo: handle popular.recent
     });
@@ -276,8 +281,11 @@ function handleStateChange() {
 
     // Reset popular button
     let injPop = $(`#${INJ_POP_ID}`);
+
     injPop.off();
     injPop.on("click", prepFetch);
+    popClickCallbacks = [];
+
     injPop.css("color", "");
 
     addClickCallbacks();
