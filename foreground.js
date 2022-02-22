@@ -8,8 +8,8 @@ var MODE_MANGA = "manga";
 
 var SUFFIXES = ["100000", "50000", "30000", "10000", "5000", "1000", "500", "100", "50"];
 
-var COLOR_ORANGE = "rgb(255 126 48)";
-var COLOR_BLUE = "rgb(0 150 240)";
+var COLOR_ORANGE = "rgb(253 158 22)";
+var COLOR_BLUE = "rgb(0 150 250)";
 
 var canvasIds = [];
 var popClickCallbacks = [];
