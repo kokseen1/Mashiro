@@ -7,11 +7,16 @@
 This extension does not enable the official `Sort by popularity` mode, but merely retrieves popular illustrations and manga via tags.
 
 ## Disclaimer
-
-
 - Works best for popular tags (>10000 results).
-- Still a WIP. Very unstable. Lots of things yet to be cleaned up.
-- ~It only works for certain *(~very~ few)* tags.~
+- Still a WIP. ~Very unstable. Lots of things yet to be cleaned up.~
+- ~It only works for certain *(very few)* tags.~
+
+## Installation
+1. Clone this repository
+2. Visit `chrome://extensions` in Chrome
+3. Turn on Developer mode
+4. Click `Load unpacked`
+5. Select the `Mashiro` folder
 
 ## Guide
 - Button turns **orange** if results from normal search are available
