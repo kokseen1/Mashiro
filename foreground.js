@@ -11,11 +11,13 @@ var MODE_MANGA = "manga";
 var COLOR_ORANGE = "rgb(253 158 22)";
 var COLOR_BLUE = "rgb(0 150 250)";
 
+var RESULTS_MAX = 1000;
+
 var canvasIds = [];
 var popClickCallbacks = [];
 
-var currMode;
-var liTitleClass;
+var currModeGlobal;
+var liTitleClassGlobal;
 
 var INJ_POP_ID = "inj-pop";
 var INJ_LI_CLASS = "inj-li";
@@ -28,6 +30,8 @@ var LI_CLASS = ".sc-l7cibp-2.gpVAva";
 var COUNT_DIV_CLASS = ".sc-7zddlj-2.dVRwUc span";
 var PAGE_NAV_CLASS = ".sc-xhhh7v-0.kYtoqc";
 var SEARCHBOX_CLASS = ".sc-5ki62n-4";
+var BANNER_ICON_CLASS = ".sc-jn70pf-2.dhOsiK";
+
 
 // Perform regex matching to find suffix
 function suffixRegex(query) {
@@ -63,43 +67,15 @@ function genSearchUrlSuffixed(query, suffix, page) {
     return genSearchUrl(querySuffixed, page);
 }
 
-// Main thumbnail injecting function
-function injectLi(i, suffix) {
-    // Skip repeats
+// Generate thumbnail li element
+function generateLi(i, popType) {
     let illust_id = i.id;
-    if (canvasIds.includes(illust_id)) return;
-
-    // Filter by mode
-    let illust_type = i.illustType;
-    if (currMode == MODE_ILLUST && illust_type == 1) return;
-    if (currMode == MODE_MANGA && illust_type == 0) return;
-
-    // Skip fakes and tagless
-    let illust_tags = i.tags;
-    if (!illust_tags) return;
-    if (illust_tags.includes(TAG_FAKE)) return;
-
-    // Differentiate from alt pop
-    let popClassName = "pop-alt";
-    if (suffix) popClassName = "pop-suf";
-
-    // Get suffix from tags
-    illust_tags.forEach(tag => {
-        let suffixReg = suffixRegex(tag);
-        if (suffixReg) {
-            suffix = suffixReg[2];
-            return;
-        }
-    });
-    // Skip if not popular (tentative)
-    if (!suffix) return;
-
     let artist_id = i.userId;
     let illust_thumb_url = i.url;
     let illust_alt = i.alt;
     let illust_title = i.title;
 
-    let thumbLi = $(`<li class='sc-l7cibp-2 gpVAva ${INJ_LI_CLASS} ${popClassName}'></li>`)
+    let thumbLi = $(`<li class='sc-l7cibp-2 gpVAva ${INJ_LI_CLASS} ${popType}'></li>`)
 
         .append($(`<div class="sc-iasfms-3 jDiQFZ"></div>`)
             .append($(`<div type="illust" size="184" class="sc-iasfms-1 hYfnPb"></div>`)
@@ -110,7 +86,45 @@ function injectLi(i, suffix) {
                             )))))
 
             .append($(`<div class="sc-iasfms-0 jtpclu"></div>`)
-                .append($(`<a class="${liTitleClass}" href="/en/artworks/${illust_id}">${illust_title}</a>`))));
+                .append($(`<a class="${liTitleClassGlobal}" href="/en/artworks/${illust_id}">${illust_title}</a>`))));
+
+    return thumbLi;
+}
+
+// Main thumbnail injecting function
+function injectLi(i, suffix) {
+    // Skip repeats
+    let illust_id = i.id;
+    if (canvasIds.includes(illust_id)) return;
+
+    // Filter by mode
+    let illust_type = i.illustType;
+    if (currModeGlobal == MODE_ILLUST && illust_type == 1) return;
+    if (currModeGlobal == MODE_MANGA && illust_type == 0) return;
+
+    // Skip fakes and tagless
+    let illust_tags = i.tags;
+    if (!illust_tags) return;
+    if (illust_tags.includes(TAG_FAKE)) return;
+
+    // Differentiate from alt pop
+    let popType = "pop-alt";
+    if (suffix) popType = "pop-suf";
+
+    // Get suffix from tags
+    illust_tags.forEach(tag => {
+        let suffixReg = suffixRegex(tag);
+        if (suffixReg) {
+            suffix = suffixReg[2];
+            return;
+        }
+    });
+
+    // Skip if not popular (tentative)
+    if (!suffix) return;
+
+    // Generate li element
+    let thumbLi = generateLi(i, popType);
 
     // Inject li to appropriate section
     $(`#inj-${suffix}`).append(thumbLi);
@@ -120,7 +134,7 @@ function injectLi(i, suffix) {
     $(COUNT_DIV_CLASS).text(canvasIds.length);
 }
 
-// Recursively search for and inject results via suffix
+// Recursively search for and inject results via given suffix
 function handleSuffix(suffix, page = 1) {
     let illustSearchUrl = genSearchUrlSuffixed(getSearchQuery(), suffix, page);
     $.getJSON(illustSearchUrl, function (data) {
@@ -129,18 +143,22 @@ function handleSuffix(suffix, page = 1) {
             injectLi(i, suffix);
         });
 
-        // Kill switch to stop searching next page
-        if (canvasIds.length > 1000) return;
+        // Kill switch to prevent searching the next page
+        if (canvasIds.length > RESULTS_MAX) return;
 
         // Recursively get more popular illusts if available
-        if (illustsArr.length == 60 && SUFFIXES.slice(0, 5).includes(suffix)) handleSuffix(suffix, page + 1);
+        if (illustsArr.length == 60 && SUFFIXES.slice(0, 5).includes(suffix))
+            handleSuffix(suffix, page + 1);
     });
 }
 
-// Remove all li thumbnail elements and clear id cache
+// Remove all thumbnail elements and clear illust id array
 function removeAllLi() {
     $(LI_CLASS).remove();
+
+    // Reset count
     canvasIds = [];
+    $(COUNT_DIV_CLASS).text("0");
     console.log("Removed all thumbs");
 }
 
@@ -149,33 +167,39 @@ function removePageNav() {
     $(PAGE_NAV_CLASS).remove();
 }
 
+// Get the current URL
+function getCurrUrl() {
+    return window.location.toString();
+}
 
 // Get the current mode (illust/manga)
 function getCurrMode() {
-    let currUrl = window.location.toString();
-    // Default to illusts
-    currMode = MODE_ILLUST;
+    let currUrl = getCurrUrl();
+
+    // Default mode to illusts
+    currModeGlobal = MODE_ILLUST;
     if (currUrl.includes(`/${MODE_MANGA}`)) {
-        currMode = MODE_MANGA;
+        currModeGlobal = MODE_MANGA;
     }
 }
 
 // Define appropriate global li class name
 function getLiTitleClass() {
-    liTitleClass = LI_TITLE_LOGGEDIN_CLASS;
-    if ($(LOGIN_BANNER_CLASS).length) liTitleClass = LI_TITLE_LOGGEDOUT_CLASS;
+    liTitleClassGlobal = LI_TITLE_LOGGEDIN_CLASS;
+    if ($(LOGIN_BANNER_CLASS).length) liTitleClassGlobal = LI_TITLE_LOGGEDOUT_CLASS;
 }
 
 // To be run before every retrieval
 function prepFetch() {
+    // Clear canvas
     removeAllLi();
     removePageNav();
-    $(COUNT_DIV_CLASS).text("0");
 
     // Retrieve global configs
     getCurrMode();
     getLiTitleClass();
 
+    // Execute available callbacks
     popClickCallbacks.forEach(function (callbackFunc) {
         callbackFunc();
     });
@@ -191,12 +215,12 @@ function popCallback() {
     });
 }
 
-// Generate recommended api url, limit default at 180 (max)
+// Generate recommended api url, default limit at 180 (max)
 function genRecoUrl(illust_id, limit = 180) {
     return `https://www.pixiv.net/ajax/illust/${illust_id}/recommend/init?limit=${limit}&lang=en`;
 }
 
-// Handle recommendations
+// Handle recommendations from alt pop
 function handleRecos(illust_id, query) {
     $.getJSON(genRecoUrl(illust_id), function (data) {
         data.body.illusts.forEach(i => {
@@ -222,28 +246,32 @@ function altPopCallback() {
         data.body.popular.permanent.forEach(i => {
             // Inject permanent illusts
             injectLi(i);
+
             handleRecos(i.id, query);
         });
     });
 }
 
-// Remove banner
+// Remove premium banner
 function removeBanner() {
-    $(".sc-jn70pf-2.dhOsiK").parent().remove();
+    $(BANNER_ICON_CLASS).parent().remove();
 }
 
+// Remove all injected thumbs
 function removeInjectedLi() {
     $(`.${INJ_LI_CLASS}`).remove();
 }
 
-// Test for pop availability and add callbacks
+// Test for pop/alt availability and add callbacks accordingly
 function addClickCallbacks() {
     // Flag to prioritise pop suffix color
     let popAvail;
+
     let injPop = $(`#${INJ_POP_ID}`);
+
     let query = getSearchQuery();
 
-    // Temp search for 100users
+    // Perform temp search for 100users
     let tempSearchUrlSuffixed = genSearchUrlSuffixed(query, 100);
     $.getJSON(tempSearchUrlSuffixed, function (data) {
         if (data.body.illustManga.data.length) {
@@ -268,7 +296,7 @@ function addClickCallbacks() {
 
 // Called whenever there is an update to the page
 function handleStateChange() {
-    // removeBanner();
+    // removeBanner(); // Optional
 
     // Remove previously injected li
     removeInjectedLi();
@@ -276,13 +304,18 @@ function handleStateChange() {
     // Reset popular button
     let injPop = $(`#${INJ_POP_ID}`);
 
+    // Reset color
+    injPop.css("color", "");
     injPop.off();
-    injPop.on("click", prepFetch);
+
+    // Clear callbacks arr
     popClickCallbacks = [];
 
-    injPop.css("color", "");
-
+    // Could be sequential to ensure consistency
     addClickCallbacks();
+
+    // Re-set callback
+    injPop.on("click", prepFetch);
 }
 
 // Inject jQuery into document head
@@ -300,6 +333,7 @@ function injectJQuery() {
 
 // Inject Popular button
 function injectPopular() {
+    // Return if already exists
     if ($(`#${INJ_POP_ID}`).length) return;
     let ogPopSort = $(POP_SORT_ICON_CLASS).parent();
     let injPop = ogPopSort.clone();
@@ -316,20 +350,27 @@ function injectSections() {
     });
 }
 
-var isPopInjected = document.getElementById(INJ_POP_ID);
-if (isPopInjected) {
-    // On tag change
+// Vars are removed when page is refreshed
+// jQuery is removed when page is refreshed
 
+// Popular button is removed when illust->manga tab switch/page refreshed
+// Sections are removed when illust->manga tab switch/page refreshed
+
+// jQuery gets removed only when page is refreshed
+// Always check just to be safe
+injectJQuery();
+
+// Determine type of change
+if (document.getElementById(INJ_POP_ID)) {
+    // On tag change/old->new tab switch
     console.log("Already added button!");
 
     handleStateChange();
 
 } else {
-    // First run/manga tab switch
-
+    // On refresh/illust->manga tab switch
     console.log("Adding button");
 
-    injectJQuery();
     injectPopular();
     injectSections();
 
