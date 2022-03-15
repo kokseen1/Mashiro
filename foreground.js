@@ -35,7 +35,7 @@ var BANNER_ICON_CLASS = ".sc-jn70pf-2.dhOsiK";
 
 // Perform regex matching to find suffix
 function suffixRegex(query) {
-    const queryReg = /(([1|3|5]0+)users入り)$/;
+    const queryReg = /(((10|30|5)0+)users入り)$/;
     let queryMatch = query.match(queryReg);
     // queryMatch[0/1]: 100users入り
     // queryMatch[2]: 100
@@ -132,6 +132,7 @@ function injectLi(i, suffix) {
     // Add to and update canvas arr
     canvasIds.push(illust_id);
     $(COUNT_DIV_CLASS).text(canvasIds.length);
+    return true;
 }
 
 // Recursively search for and inject results via given suffix
@@ -220,17 +221,19 @@ function genRecoUrl(illust_id, limit = 180) {
     return `https://www.pixiv.net/ajax/illust/${illust_id}/recommend/init?limit=${limit}&lang=en`;
 }
 
+
 // Handle recommendations from alt pop
 function handleRecos(illust_id, query) {
+    if (canvasIds.length > RESULTS_MAX) return;
     $.getJSON(genRecoUrl(illust_id), function (data) {
         data.body.illusts.forEach(i => {
             // Skip unrelated (might move to injectLi)
             if (i.tags && !i.tags.includes(query)) return;
-            injectLi(i);
+            let injectResult = injectLi(i);
 
-            // Todo: recursion
-            // let recoUrl = genRecoUrl(i.id);
-            // handleRecos(recoUrl, query);
+            // Recursive search optimised for efficiency
+            // Not exhaustive, but fast
+            if (i.id && injectResult) handleRecos(i.id, query);
         });
     });
 }
@@ -243,10 +246,15 @@ function altPopCallback() {
     let querySearchUrl = genSearchUrl(query);
 
     $.getJSON(querySearchUrl, function (data) {
+        // Inject permanent illusts
         data.body.popular.permanent.forEach(i => {
-            // Inject permanent illusts
             injectLi(i);
+            handleRecos(i.id, query);
+        });
 
+        // Inject recent illusts
+        data.body.popular.recent.forEach(i => {
+            injectLi(i);
             handleRecos(i.id, query);
         });
     });
