@@ -1,15 +1,12 @@
-# Mashiro
- 
-## Enable Popular Mode on Pixiv
+# Mashiro ![icon](https://github.com/kokseen1/Mashiro/blob/main/images/mashiro.png?raw=true)
 
-![alt text](https://github.com/kokseen1/Mashiro/raw/main/images/mashiro.png?raw=true)
+Mashiro is a Chrome extension to sort illustrations and manga by popularity on Pixiv. 
 
-This extension does not enable the official `Sort by popularity` mode, but merely retrieves popular illustrations and manga via tags.
+It works by looking for the tag with the suffix `users入り` that is automatically applied on posts that surpass a certain amount of likes. This extension does not enable the official `Sort by popularity` mode, and thus will not have 100% accurate results.
 
-## Disclaimer
-- Works best for popular tags (>10000 results).
-- Still a WIP. ~Very unstable. Lots of things yet to be cleaned up.~
-- ~It only works for certain *(very few)* tags.~
+## Demo
+
+![demo](https://github.com/kokseen1/Mashiro/blob/main/images/demo.gif?raw=true)
 
 ## Installation
 1. Clone this repository
@@ -25,8 +22,9 @@ This extension does not enable the official `Sort by popularity` mode, but merel
 
 ## Usage Notes
  - Works best with official Pixiv series tags used by artists. (orange + blue mode)
-	 - `エヴァ` instead of `エヴァンゲリオン`
-	 - `SAO` instead of `ソードアート・オンライン`
+	 - Examples:
+	 	- `エヴァ` instead of `エヴァンゲリオン`
+	 	- `SAO` instead of `ソードアート・オンライン`
  - Most character tags are supported! (blue mode)
 	 - Examples:
  		- `歳納京子`
