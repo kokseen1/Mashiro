@@ -1,4 +1,4 @@
-# Mashiro ![icon](https://github.com/kokseen1/Mashiro/blob/main/images/mashiro.png?raw=true)
+# ![icon](https://github.com/kokseen1/Mashiro/blob/main/images/mashiro.png?raw=true) Mashiro
 
 Mashiro is a Chrome extension to sort illustrations and manga by popularity on Pixiv. 
 
