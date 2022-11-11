@@ -160,7 +160,7 @@ function removeAllLi() {
     // Reset count
     canvasIds = [];
     $(COUNT_DIV_CLASS).text("0");
-    console.log("Removed all thumbs");
+    // console.log("Removed all thumbs");
 }
 
 // Remove the page navigation bar
@@ -208,7 +208,7 @@ function prepFetch() {
 
 // Callback to retrieve popular via suffix
 function popCallback() {
-    console.log("Pop running!")
+    // console.log("Pop running!")
 
     // Search all possible popular suffixes
     SUFFIXES.forEach(suffix => {
@@ -240,7 +240,7 @@ function handleRecos(illust_id, query) {
 
 // Function to fetch and inject alt pop
 function altPopCallback() {
-    console.log("Alt pop running!");
+    // console.log("Alt pop running!");
 
     let query = getSearchQuery();
     let querySearchUrl = genSearchUrl(query);
@@ -371,13 +371,13 @@ injectJQuery();
 // Determine type of change
 if (document.getElementById(INJ_POP_ID)) {
     // On tag change/old->new tab switch
-    console.log("Already added button!");
+    // console.log("Already added button!");
 
     handleStateChange();
 
 } else {
     // On refresh/illust->manga tab switch
-    console.log("Adding button");
+    // console.log("Adding button");
 
     injectPopular();
     injectSections();

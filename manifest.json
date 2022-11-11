@@ -1,7 +1,7 @@
 {
     "name": "Mashiro",
     "description": "Enable Popular Mode on Pixiv",
-    "version": "0.1.0",
+    "version": "0.2.0",
     "manifest_version": 3,
     "icons": {
         "16": "./images/mashiro.png",
@@ -21,9 +21,6 @@
         }
     },
     "permissions": [
-        "activeTab",
-        "tabs",
-        "storage",
         "scripting"
     ],
     "host_permissions": [
