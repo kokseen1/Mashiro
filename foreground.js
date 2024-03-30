@@ -54,6 +54,33 @@ function getSearchQuery() {
     return query;
 }
 
+function waitForElm(selector) {
+    return new Promise(resolve => {
+        if (document.querySelector(selector)) {
+            return resolve(document.querySelector(selector));
+        }
+
+        const observer = new MutationObserver(mutations => {
+            if (document.querySelector(selector)) {
+                observer.disconnect();
+                resolve(document.querySelector(selector));
+            }
+        });
+
+        // If you get "parameter 1 is not of type 'Node'" error, see https://stackoverflow.com/a/77855838/492336
+        observer.observe(document.body, {
+            childList: true,
+            subtree: true
+        });
+    });
+}
+
+let postElement = undefined;
+waitForElm(".sc-l7cibp-2").then(element => {
+    console.log("Got post element!")
+    postElement = element.cloneNode(true)
+})
+
 // Generate search api url with given query, defaults to page 1
 function genSearchUrl(query, page = 1) {
     // Urlencode characters in query
@@ -68,27 +95,36 @@ function genSearchUrlSuffixed(query, suffix, page) {
 }
 
 // Generate thumbnail li element
+// TODO: sometimes, the posts wont load at all, and require a second click.
 function generateLi(i, popType) {
     let illust_id = i.id;
     let artist_id = i.userId;
     let illust_thumb_url = i.url;
     let illust_alt = i.alt;
     let illust_title = i.title;
+    let illust_user_name = i.userName
+    let illust_user_profile_picture = i.profileImageUrl
 
-    let thumbLi = $(`<li class='sc-l7cibp-2 dhTDfw ${INJ_LI_CLASS} ${popType}'></li>`)
+    let post = postElement.cloneNode(true)
+    post.classList.add(INJ_LI_CLASS)
+    post.id = illust_id
 
-        .append($(`<div class="sc-iasfms-3 liyNwX"></div>`)
-            .append($(`<div type="illust" size="184" class="sc-iasfms-1 frFjhu"></div>`)
-                .append($(`<div width="184" height="184" class="sc-rp5asc-0 fxGVAF"></div>`)
-                    .append($(`<a class="sc-d98f2c-0 sc-rp5asc-16 iUsZyY sc-bdnxRM fGjAxR" data-gtm-value="${illust_id}" data-gtm-user-id="${artist_id}" href="/en/artworks/${illust_id}"></a>`)
-                        .append($(`<div radius="4" class="sc-rp5asc-9 cYUezH"></div>`)
-                            .append($(`<img src="${illust_thumb_url}" alt="${illust_alt}" class="sc-rp5asc-10 eCFXg" style="object-fit: cover; object-position: center center;">`)
-                            )))))
+    const title = post.querySelectorAll(".sc-d98f2c-0.sc-iasfms-6")[0]
+    const authorName = post.querySelectorAll(".sc-d98f2c-0.sc-1rx6dmq-2")[0]
+    const authorPFP = post.querySelectorAll(".sc-1asno00-0 > img")[0]
+    authorPFP.src = illust_user_profile_picture
 
-            .append($(`<div class="sc-iasfms-0 jtpclu"></div>`)
-                .append($(`<a class="${liTitleClassGlobal}" href="/en/artworks/${illust_id}">${illust_title}</a>`))));
+    const illustLink = post.querySelectorAll(".sc-d98f2c-0.sc-rp5asc-16")[0]
+    illustLink.href = `/en/artworks/${illust_id}`
+    illustLink.setAttribute("data-gtm-user-id", artist_id)
+    const illustImg = post.querySelectorAll(".sc-d98f2c-0.sc-rp5asc-16 > .sc-rp5asc-9 > img")[0]
+    illustImg.alt = illust_alt
+    illustImg.src = illust_thumb_url
 
-    return thumbLi;
+    authorName.textContent = illust_user_name
+    title.textContent = illust_title
+
+    return post;
 }
 
 // Main thumbnail injecting function
@@ -221,7 +257,6 @@ function genRecoUrl(illust_id, limit = 180) {
     return `https://www.pixiv.net/ajax/illust/${illust_id}/recommend/init?limit=${limit}&lang=en`;
 }
 
-
 // Handle recommendations from alt pop
 function handleRecos(illust_id, query) {
     if (canvasIds.length > RESULTS_MAX) return;
@@ -233,7 +268,7 @@ function handleRecos(illust_id, query) {
 
             // Recursive search optimised for efficiency
             // Not exhaustive, but fast
-            if (i.id && injectResult) handleRecos(i.id, query);
+            // if (i.id && injectResult) handleRecos(i.id, query);
         });
     });
 }
