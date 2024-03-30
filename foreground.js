@@ -268,7 +268,7 @@ function handleRecos(illust_id, query) {
 
             // Recursive search optimised for efficiency
             // Not exhaustive, but fast
-            // if (i.id && injectResult) handleRecos(i.id, query);
+            if (i.id && injectResult) handleRecos(i.id, query);
         });
     });
 }
