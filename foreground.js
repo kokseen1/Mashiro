@@ -19,19 +19,19 @@ var popClickCallbacks = [];
 var currModeGlobal;
 var liTitleClassGlobal;
 
+// TODO: Pull these from the app automatically - as they arent constant
 var INJ_POP_ID = "inj-pop";
 var INJ_LI_CLASS = "inj-li";
 var LOGIN_BANNER_CLASS = ".sc-oh3a2p-4.gHKmNu";
 var POP_SORT_ICON_CLASS = ".sc-1xl12os-0.sc-rkvk44-0.cvJBhn.jSdItB";
 var LI_TITLE_LOGGEDOUT_CLASS = "sc-d98f2c-0 sc-iasfms-4 hFGeeG";
 var LI_TITLE_LOGGEDIN_CLASS = "sc-d98f2c-0 sc-iasfms-4 cTvdTb bZOnOL";
-var THUMBS_UL_CLASS = ".sc-l7cibp-1.krFoBL";
-var LI_CLASS = ".sc-l7cibp-2.gpVAva";
+var THUMBS_UL_CLASS = ".sc-l7cibp-1";
+var LI_CLASS = ".sc-l7cibp-2";
 var COUNT_DIV_CLASS = ".sc-7zddlj-2.dVRwUc span";
 var PAGE_NAV_CLASS = ".sc-xhhh7v-0.kYtoqc";
 var SEARCHBOX_CLASS = ".sc-5ki62n-4";
 var BANNER_ICON_CLASS = ".sc-jn70pf-2.dhOsiK";
-
 
 // Perform regex matching to find suffix
 function suffixRegex(query) {
@@ -75,10 +75,10 @@ function generateLi(i, popType) {
     let illust_alt = i.alt;
     let illust_title = i.title;
 
-    let thumbLi = $(`<li class='sc-l7cibp-2 gpVAva ${INJ_LI_CLASS} ${popType}'></li>`)
+    let thumbLi = $(`<li class='sc-l7cibp-2 dhTDfw ${INJ_LI_CLASS} ${popType}'></li>`)
 
-        .append($(`<div class="sc-iasfms-3 jDiQFZ"></div>`)
-            .append($(`<div type="illust" size="184" class="sc-iasfms-1 hYfnPb"></div>`)
+        .append($(`<div class="sc-iasfms-3 liyNwX"></div>`)
+            .append($(`<div type="illust" size="184" class="sc-iasfms-1 frFjhu"></div>`)
                 .append($(`<div width="184" height="184" class="sc-rp5asc-0 fxGVAF"></div>`)
                     .append($(`<a class="sc-d98f2c-0 sc-rp5asc-16 iUsZyY sc-bdnxRM fGjAxR" data-gtm-value="${illust_id}" data-gtm-user-id="${artist_id}" href="/en/artworks/${illust_id}"></a>`)
                         .append($(`<div radius="4" class="sc-rp5asc-9 cYUezH"></div>`)
