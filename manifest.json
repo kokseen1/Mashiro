@@ -23,6 +23,19 @@
     "permissions": [
         "scripting"
     ],
+    "web_accessible_resources": [
+        {
+            "resources": [
+                "jquery-3.6.0.min.js"
+            ],
+            "extension_ids": [
+                "*"
+            ],
+            "matches": [
+                "*://*/*"
+            ]
+        }
+    ],
     "host_permissions": [
         "https://www.pixiv.net/*"
     ],
